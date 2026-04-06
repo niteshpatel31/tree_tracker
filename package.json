@@ -1,0 +1,21 @@
+{
+  "name": "dot-explorer",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "dev": "pnpm --parallel --filter backend --filter frontend run dev",
+    "dev:backend": "pnpm --filter backend run dev",
+    "dev:frontend": "pnpm --filter frontend run dev",
+    "start": "pnpm install && pnpm run dev",
+    "db:push": "pnpm --filter backend run db:push",
+    "db:push-force": "pnpm --filter backend run db:push-force",
+    "api:generate": "pnpm --filter backend run api:generate"
+  },
+  "private": true,
+  "devDependencies": {
+    "typescript": "~5.9.2",
+    "prettier": "^3.8.1"
+  }
+}

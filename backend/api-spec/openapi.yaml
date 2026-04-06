@@ -1,0 +1,726 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Tree Monitoring System API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: trees
+    description: Tree management
+  - name: reports
+    description: Tree cutting reports
+  - name: dashboard
+    description: Analytics and stats
+  - name: admin
+    description: Admin operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /trees:
+    get:
+      operationId: listTrees
+      tags: [trees]
+      summary: List all trees
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: district
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [planted, cut, at_risk]
+        - name: year
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of trees
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListTreesResponse"
+    post:
+      operationId: createTree
+      tags: [trees]
+      summary: Register a new planted tree
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTreeBody"
+      responses:
+        "201":
+          description: Tree created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tree"
+
+  /trees/{id}:
+    get:
+      operationId: getTree
+      tags: [trees]
+      summary: Get tree details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tree details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tree"
+        "404":
+          description: Tree not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateTreeStatus
+      tags: [trees]
+      summary: Update tree status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTreeStatusBody"
+      responses:
+        "200":
+          description: Tree updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tree"
+        "404":
+          description: Tree not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteTree
+      tags: [trees]
+      summary: Delete a tree
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tree deleted
+        "404":
+          description: Tree not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List all reports
+      responses:
+        "200":
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListReportsResponse"
+    post:
+      operationId: createReport
+      tags: [reports]
+      summary: Submit a tree event report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReportBody"
+      responses:
+        "201":
+          description: Report submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get overall dashboard statistics
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/state-stats:
+    get:
+      operationId: getStateStats
+      tags: [dashboard]
+      summary: Get state-wise tree statistics
+      responses:
+        "200":
+          description: State-wise statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListStateStatsResponse"
+
+  /dashboard/year-stats:
+    get:
+      operationId: getYearStats
+      tags: [dashboard]
+      summary: Get year-wise plantation comparison
+      responses:
+        "200":
+          description: Year-wise statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListYearStatsResponse"
+
+  /admin/users:
+    get:
+      operationId: listUsers
+      tags: [admin]
+      summary: List all users
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListUsersResponse"
+    post:
+      operationId: createUser
+      tags: [admin]
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Bad request
+        "409":
+          description: User already exists
+
+  /admin/users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      operationId: updateUser
+      tags: [admin]
+      summary: Update a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          description: User not found
+    delete:
+      operationId: deleteUser
+      tags: [admin]
+      summary: Delete a user
+      responses:
+        "200":
+          description: User deleted
+        "404":
+          description: User not found
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Tree:
+      type: object
+      properties:
+        id:
+          type: integer
+        treeCode:
+          type: string
+          description: "Unique tree ID e.g. CG-RPR-2026-000123"
+        state:
+          type: string
+        stateCode:
+          type: string
+        district:
+          type: string
+        districtCode:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        plantationDate:
+          type: string
+        status:
+          type: string
+          enum: [planted, cut, at_risk]
+        species:
+          type: string
+        plantedBy:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        survivalStatus:
+          type: string
+          enum: [healthy, at_risk, dead]
+        carbonCredits:
+          type: number
+        notes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - treeCode
+        - state
+        - stateCode
+        - district
+        - districtCode
+        - latitude
+        - longitude
+        - plantationDate
+        - status
+        - species
+        - plantedBy
+        - survivalStatus
+        - carbonCredits
+        - createdAt
+        - updatedAt
+
+    ListTreesResponse:
+      type: object
+      properties:
+        trees:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tree"
+        total:
+          type: integer
+      required:
+        - trees
+        - total
+
+    CreateTreeBody:
+      type: object
+      properties:
+        state:
+          type: string
+        stateCode:
+          type: string
+        district:
+          type: string
+        districtCode:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        species:
+          type: string
+        plantedBy:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+        - state
+        - stateCode
+        - district
+        - districtCode
+        - latitude
+        - longitude
+        - species
+        - plantedBy
+
+    UpdateTreeStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [planted, cut, at_risk]
+        survivalStatus:
+          type: string
+          enum: [healthy, at_risk, dead]
+        notes:
+          type: string
+          nullable: true
+      required:
+        - status
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+        treeId:
+          type: integer
+          nullable: true
+        treeCode:
+          type: string
+          nullable: true
+        reportType:
+          type: string
+          enum: [plantation, cutting, survival_check, illegal_cutting]
+        reportedBy:
+          type: string
+        description:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        state:
+          type: string
+        district:
+          type: string
+        status:
+          type: string
+          enum: [pending, verified, rejected]
+        createdAt:
+          type: string
+      required:
+        - id
+        - reportType
+        - reportedBy
+        - description
+        - state
+        - district
+        - status
+        - createdAt
+
+    ListReportsResponse:
+      type: object
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/Report"
+        total:
+          type: integer
+      required:
+        - reports
+        - total
+
+    CreateReportBody:
+      type: object
+      properties:
+        treeId:
+          type: integer
+          nullable: true
+        treeCode:
+          type: string
+          nullable: true
+        reportType:
+          type: string
+          enum: [plantation, cutting, survival_check, illegal_cutting]
+        reportedBy:
+          type: string
+        description:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        state:
+          type: string
+        district:
+          type: string
+      required:
+        - reportType
+        - reportedBy
+        - description
+        - state
+        - district
+
+    DashboardStats:
+      type: object
+      properties:
+        totalTrees:
+          type: integer
+        totalPlanted:
+          type: integer
+        totalCut:
+          type: integer
+        totalAtRisk:
+          type: integer
+        totalStates:
+          type: integer
+        totalReports:
+          type: integer
+        carbonCreditsTotal:
+          type: number
+        survivalRate:
+          type: number
+      required:
+        - totalTrees
+        - totalPlanted
+        - totalCut
+        - totalAtRisk
+        - totalStates
+        - totalReports
+        - carbonCreditsTotal
+        - survivalRate
+
+    StateStat:
+      type: object
+      properties:
+        state:
+          type: string
+        stateCode:
+          type: string
+        totalTrees:
+          type: integer
+        planted:
+          type: integer
+        cut:
+          type: integer
+        atRisk:
+          type: integer
+        survivalRate:
+          type: number
+      required:
+        - state
+        - stateCode
+        - totalTrees
+        - planted
+        - cut
+        - atRisk
+        - survivalRate
+
+    ListStateStatsResponse:
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/StateStat"
+      required:
+        - states
+
+    YearStat:
+      type: object
+      properties:
+        year:
+          type: integer
+        planted:
+          type: integer
+        cut:
+          type: integer
+      required:
+        - year
+        - planted
+        - cut
+
+    ListYearStatsResponse:
+      type: object
+      properties:
+        years:
+          type: array
+          items:
+            $ref: "#/components/schemas/YearStat"
+      required:
+        - years
+
+    # Admin schemas
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [citizen, officer, admin]
+        state:
+          type: string
+        employeeId:
+          type: string
+        department:
+          type: string
+        designation:
+          type: string
+        verificationStatus:
+          type: string
+          enum: [pending, verified]
+        createdAt:
+          type: string
+        type:
+          type: string
+          enum: [citizen, officer]
+      required:
+        - id
+        - name
+        - email
+        - role
+        - state
+        - createdAt
+        - type
+
+    ListUsersResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+      required:
+        - users
+        - total
+
+    CreateUserBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [citizen, officer]
+        state:
+          type: string
+        employeeId:
+          type: string
+        department:
+          type: string
+        designation:
+          type: string
+      required:
+        - name
+        - email
+        - password
+        - role
+        - state
+
+    UpdateUserBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        state:
+          type: string
+        employeeId:
+          type: string
+        department:
+          type: string
+        designation:
+          type: string
+        verificationStatus:
+          type: string
+          enum: [pending, verified]
+
+    UserResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - user
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
