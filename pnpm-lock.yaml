@@ -32,15 +32,6 @@ overrides:
 
 importers:
 
-  .:
-    devDependencies:
-      prettier:
-        specifier: ^3.8.1
-        version: 3.8.1
-      typescript:
-        specifier: ~5.9.2
-        version: 5.9.3
-
   backend:
     dependencies:
       cookie-parser:
@@ -58,6 +49,9 @@ importers:
       express:
         specifier: ^5
         version: 5.2.1
+      nodemailer:
+        specifier: ^8.0.4
+        version: 8.0.4
       pg:
         specifier: ^8.20.0
         version: 8.20.0
@@ -83,6 +77,9 @@ importers:
       '@types/node':
         specifier: ^25.3.3
         version: 25.5.2
+      '@types/nodemailer':
+        specifier: ^8.0.0
+        version: 8.0.0
       '@types/pg':
         specifier: ^8.18.0
         version: 8.20.0
@@ -97,7 +94,7 @@ importers:
         version: 2.3.3(esbuild@0.27.3)(pino-pretty@13.1.3)(pino@9.14.0)(thread-stream@3.1.0)
       orval:
         specifier: ^7.5.0
-        version: 7.21.0(typescript@5.9.3)
+        version: 7.21.0
       pino-pretty:
         specifier: ^13
         version: 13.1.3
@@ -1253,66 +1250,79 @@ packages:
     resolution: {integrity: sha512-L+34Qqil+v5uC0zEubW7uByo78WOCIrBvci69E7sFASRl0X7b/MB6Cqd1lky/CtcSVTydWa2WZwFuWexjS5o6g==}
     cpu: [arm]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm-musleabihf@4.60.1':
     resolution: {integrity: sha512-n83O8rt4v34hgFzlkb1ycniJh7IR5RCIqt6mz1VRJD6pmhRi0CXdmfnLu9dIUS6buzh60IvACM842Ffb3xd6Gg==}
     cpu: [arm]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-arm64-gnu@4.60.1':
     resolution: {integrity: sha512-Nql7sTeAzhTAja3QXeAI48+/+GjBJ+QmAH13snn0AJSNL50JsDqotyudHyMbO2RbJkskbMbFJfIJKWA6R1LCJQ==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.60.1':
     resolution: {integrity: sha512-+pUymDhd0ys9GcKZPPWlFiZ67sTWV5UU6zOJat02M1+PiuSGDziyRuI/pPue3hoUwm2uGfxdL+trT6Z9rxnlMA==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-loong64-gnu@4.60.1':
     resolution: {integrity: sha512-VSvgvQeIcsEvY4bKDHEDWcpW4Yw7BtlKG1GUT4FzBUlEKQK0rWHYBqQt6Fm2taXS+1bXvJT6kICu5ZwqKCnvlQ==}
     cpu: [loong64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-loong64-musl@4.60.1':
     resolution: {integrity: sha512-4LqhUomJqwe641gsPp6xLfhqWMbQV04KtPp7/dIp0nzPxAkNY1AbwL5W0MQpcalLYk07vaW9Kp1PBhdpZYYcEw==}
     cpu: [loong64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-ppc64-gnu@4.60.1':
     resolution: {integrity: sha512-tLQQ9aPvkBxOc/EUT6j3pyeMD6Hb8QF2BTBnCQWP/uu1lhc9AIrIjKnLYMEroIz/JvtGYgI9dF3AxHZNaEH0rw==}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-ppc64-musl@4.60.1':
     resolution: {integrity: sha512-RMxFhJwc9fSXP6PqmAz4cbv3kAyvD1etJFjTx4ONqFP9DkTkXsAMU4v3Vyc5BgzC+anz7nS/9tp4obsKfqkDHg==}
     cpu: [ppc64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-riscv64-gnu@4.60.1':
     resolution: {integrity: sha512-QKgFl+Yc1eEk6MmOBfRHYF6lTxiiiV3/z/BRrbSiW2I7AFTXoBFvdMEyglohPj//2mZS4hDOqeB0H1ACh3sBbg==}
     cpu: [riscv64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-musl@4.60.1':
     resolution: {integrity: sha512-RAjXjP/8c6ZtzatZcA1RaQr6O1TRhzC+adn8YZDnChliZHviqIjmvFwHcxi4JKPSDAt6Uhf/7vqcBzQJy0PDJg==}
     cpu: [riscv64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-s390x-gnu@4.60.1':
     resolution: {integrity: sha512-wcuocpaOlaL1COBYiA89O6yfjlp3RwKDeTIA0hM7OpmhR1Bjo9j31G1uQVpDlTvwxGn2nQs65fBFL5UFd76FcQ==}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.60.1':
     resolution: {integrity: sha512-77PpsFQUCOiZR9+LQEFg9GClyfkNXj1MP6wRnzYs0EeWbPcHs02AXu4xuUbM1zhwn3wqaizle3AEYg5aeoohhg==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.60.1':
     resolution: {integrity: sha512-5cIATbk5vynAjqqmyBjlciMJl1+R/CwX9oLk/EyiFXDWd95KpHdrOJT//rnUl4cUcskrd0jCCw3wpZnhIHdD9w==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-openbsd-x64@4.60.1':
     resolution: {integrity: sha512-cl0w09WsCi17mcmWqqglez9Gk8isgeWvoUZ3WiJFYSR3zjBQc2J5/ihSjpl+VLjPqjQ/1hJRcqBfLjssREQILw==}
@@ -1474,24 +1484,28 @@ packages:
     engines: {node: '>= 20'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@tailwindcss/oxide-linux-arm64-musl@4.2.2':
     resolution: {integrity: sha512-oCfG/mS+/+XRlwNjnsNLVwnMWYH7tn/kYPsNPh+JSOMlnt93mYNCKHYzylRhI51X+TbR+ufNhhKKzm6QkqX8ag==}
     engines: {node: '>= 20'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@tailwindcss/oxide-linux-x64-gnu@4.2.2':
     resolution: {integrity: sha512-rTAGAkDgqbXHNp/xW0iugLVmX62wOp2PoE39BTCGKjv3Iocf6AFbRP/wZT/kuCxC9QBh9Pu8XPkv/zCZB2mcMg==}
     engines: {node: '>= 20'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@tailwindcss/oxide-linux-x64-musl@4.2.2':
     resolution: {integrity: sha512-XW3t3qwbIwiSyRCggeO2zxe3KWaEbM0/kW9e8+0XpBgyKU4ATYzcVSMKteZJ1iukJ3HgHBjbg9P5YPRCVUxlnQ==}
     engines: {node: '>= 20'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@tailwindcss/oxide-wasm32-wasi@4.2.2':
     resolution: {integrity: sha512-eKSztKsmEsn1O5lJ4ZAfyn41NfG7vzCg496YiGtMDV86jz1q/irhms5O0VrY6ZwTUkFy/EKG3RfWgxSI3VbZ8Q==}
@@ -1621,6 +1635,9 @@ packages:
 
   '@types/node@25.5.2':
     resolution: {integrity: sha512-tO4ZIRKNC+MDWV4qKVZe3Ql/woTnmHDr5JD8UI5hn2pwBrHEwOEMZK7WlNb5RKB6EoJ02gwmQS9OrjuFnZYdpg==}
+
+  '@types/nodemailer@8.0.0':
+    resolution: {integrity: sha512-fyf8jWULsCo0d0BuoQ75i6IeoHs47qcqxWc7yUdUcV0pOZGjUTTOvwdG1PRXUDqN/8A64yQdQdnA2pZgcdi+cA==}
 
   '@types/pg@8.20.0':
     resolution: {integrity: sha512-bEPFOaMAHTEP1EzpvHTbmwR8UsFyHSKsRisLIHVMXnpNefSbGA1bD6CVy+qKjGSqmZqNqBDV2azOBo8TgkcVow==}
@@ -2640,24 +2657,28 @@ packages:
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   lightningcss-linux-arm64-musl@1.32.0:
     resolution: {integrity: sha512-UpQkoenr4UJEzgVIYpI80lDFvRmPVg6oqboNHfoH4CQIfNA+HOrZ7Mo7KZP02dC6LjghPQJeBsvXhJod/wnIBg==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   lightningcss-linux-x64-gnu@1.32.0:
     resolution: {integrity: sha512-V7Qr52IhZmdKPVr+Vtw8o+WLsQJYCTd8loIfpDaMRWGUZfBOYEJeyJIkqGIDMZPwPx24pUMfwSxxI8phr/MbOA==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   lightningcss-linux-x64-musl@1.32.0:
     resolution: {integrity: sha512-bYcLp+Vb0awsiXg/80uCRezCYHNg1/l3mt0gzHnWV9XP1W5sKa5/TCdGWaR/zBM2PeF/HbsQv/j2URNOiVuxWg==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   lightningcss-win32-arm64-msvc@1.32.0:
     resolution: {integrity: sha512-8SbC8BR40pS6baCM8sbtYDSwEVQd4JlFTOlaD3gWGHfThTcABnNDBda6eTZeqbofalIJhFx0qKzgHJmcPTnGdw==}
@@ -2832,6 +2853,10 @@ packages:
 
   node-releases@2.0.37:
     resolution: {integrity: sha512-1h5gKZCF+pO/o3Iqt5Jp7wc9rH3eJJ0+nh/CIoiRwjRxde/hAHyLPXYN4V3CqKAbiZPSeJFSWHmJsbkicta0Eg==}
+
+  nodemailer@8.0.4:
+    resolution: {integrity: sha512-k+jf6N8PfQJ0Fe8ZhJlgqU5qJU44Lpvp2yvidH3vp1lPnVQMgi4yEEMPXg5eJS1gFIJTVq1NHBk7Ia9ARdSBdQ==}
+    engines: {node: '>=6.0.0'}
 
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
@@ -3019,11 +3044,6 @@ packages:
   postgres-interval@1.2.0:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
-
-  prettier@3.8.1:
-    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
-    engines: {node: '>=14'}
-    hasBin: true
 
   process-warning@5.0.0:
     resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
@@ -3483,11 +3503,6 @@ packages:
     peerDependencies:
       typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x || 6.0.x
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   uc.micro@2.1.0:
     resolution: {integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==}
 
@@ -3929,25 +3944,25 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@orval/angular@7.21.0(typescript@5.9.3)':
+  '@orval/angular@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
     transitivePeerDependencies:
       - encoding
       - openapi-types
       - supports-color
       - typescript
 
-  '@orval/axios@7.21.0(typescript@5.9.3)':
+  '@orval/axios@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
     transitivePeerDependencies:
       - encoding
       - openapi-types
       - supports-color
       - typescript
 
-  '@orval/core@7.21.0(typescript@5.9.3)':
+  '@orval/core@7.21.0':
     dependencies:
       '@apidevtools/swagger-parser': 12.1.0
       '@ibm-cloud/openapi-ruleset': 1.33.8
@@ -3967,16 +3982,16 @@ snapshots:
       micromatch: 4.0.8
       openapi3-ts: 4.5.0
       swagger2openapi: 7.0.8
-      typedoc: 0.28.18(typescript@5.9.3)
+      typedoc: 0.28.18
     transitivePeerDependencies:
       - encoding
       - openapi-types
       - supports-color
       - typescript
 
-  '@orval/fetch@7.21.0(typescript@5.9.3)':
+  '@orval/fetch@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
       openapi3-ts: 4.5.0
     transitivePeerDependencies:
       - encoding
@@ -3984,10 +3999,10 @@ snapshots:
       - supports-color
       - typescript
 
-  '@orval/hono@7.21.0(typescript@5.9.3)':
+  '@orval/hono@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
-      '@orval/zod': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
+      '@orval/zod': 7.21.0
       fs-extra: 11.3.4
       lodash.uniq: 4.5.0
       openapi3-ts: 4.5.0
@@ -3997,11 +4012,11 @@ snapshots:
       - supports-color
       - typescript
 
-  '@orval/mcp@7.21.0(typescript@5.9.3)':
+  '@orval/mcp@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
-      '@orval/fetch': 7.21.0(typescript@5.9.3)
-      '@orval/zod': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
+      '@orval/fetch': 7.21.0
+      '@orval/zod': 7.21.0
       openapi3-ts: 4.5.0
     transitivePeerDependencies:
       - encoding
@@ -4009,9 +4024,9 @@ snapshots:
       - supports-color
       - typescript
 
-  '@orval/mock@7.21.0(typescript@5.9.3)':
+  '@orval/mock@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
       openapi3-ts: 4.5.0
     transitivePeerDependencies:
       - encoding
@@ -4019,10 +4034,10 @@ snapshots:
       - supports-color
       - typescript
 
-  '@orval/query@7.21.0(typescript@5.9.3)':
+  '@orval/query@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
-      '@orval/fetch': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
+      '@orval/fetch': 7.21.0
       chalk: 4.1.2
       lodash.omitby: 4.6.0
     transitivePeerDependencies:
@@ -4031,19 +4046,19 @@ snapshots:
       - supports-color
       - typescript
 
-  '@orval/swr@7.21.0(typescript@5.9.3)':
+  '@orval/swr@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
-      '@orval/fetch': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
+      '@orval/fetch': 7.21.0
     transitivePeerDependencies:
       - encoding
       - openapi-types
       - supports-color
       - typescript
 
-  '@orval/zod@7.21.0(typescript@5.9.3)':
+  '@orval/zod@7.21.0':
     dependencies:
-      '@orval/core': 7.21.0(typescript@5.9.3)
+      '@orval/core': 7.21.0
       lodash.uniq: 4.5.0
       openapi3-ts: 4.5.0
     transitivePeerDependencies:
@@ -5196,6 +5211,10 @@ snapshots:
     dependencies:
       undici-types: 7.18.2
 
+  '@types/nodemailer@8.0.0':
+    dependencies:
+      '@types/node': 25.5.2
+
   '@types/pg@8.20.0':
     dependencies:
       '@types/node': 25.5.2
@@ -6320,6 +6339,8 @@ snapshots:
 
   node-releases@2.0.37: {}
 
+  nodemailer@8.0.4: {}
+
   npm-run-path@4.0.1:
     dependencies:
       path-key: 3.1.1
@@ -6388,20 +6409,20 @@ snapshots:
     dependencies:
       yaml: 2.8.3
 
-  orval@7.21.0(typescript@5.9.3):
+  orval@7.21.0:
     dependencies:
       '@apidevtools/swagger-parser': 12.1.0
       '@commander-js/extra-typings': 14.0.0(commander@14.0.3)
-      '@orval/angular': 7.21.0(typescript@5.9.3)
-      '@orval/axios': 7.21.0(typescript@5.9.3)
-      '@orval/core': 7.21.0(typescript@5.9.3)
-      '@orval/fetch': 7.21.0(typescript@5.9.3)
-      '@orval/hono': 7.21.0(typescript@5.9.3)
-      '@orval/mcp': 7.21.0(typescript@5.9.3)
-      '@orval/mock': 7.21.0(typescript@5.9.3)
-      '@orval/query': 7.21.0(typescript@5.9.3)
-      '@orval/swr': 7.21.0(typescript@5.9.3)
-      '@orval/zod': 7.21.0(typescript@5.9.3)
+      '@orval/angular': 7.21.0
+      '@orval/axios': 7.21.0
+      '@orval/core': 7.21.0
+      '@orval/fetch': 7.21.0
+      '@orval/hono': 7.21.0
+      '@orval/mcp': 7.21.0
+      '@orval/mock': 7.21.0
+      '@orval/query': 7.21.0
+      '@orval/swr': 7.21.0
+      '@orval/zod': 7.21.0
       chalk: 4.1.2
       chokidar: 4.0.3
       commander: 14.0.3
@@ -6414,10 +6435,10 @@ snapshots:
       lodash.uniq: 4.5.0
       openapi3-ts: 4.5.0
       string-argv: 0.3.2
-      tsconfck: 2.1.2(typescript@5.9.3)
-      typedoc: 0.28.18(typescript@5.9.3)
-      typedoc-plugin-coverage: 4.0.2(typedoc@0.28.18(typescript@5.9.3))
-      typedoc-plugin-markdown: 4.11.0(typedoc@0.28.18(typescript@5.9.3))
+      tsconfck: 2.1.2
+      typedoc: 0.28.18
+      typedoc-plugin-coverage: 4.0.2(typedoc@0.28.18)
+      typedoc-plugin-markdown: 4.11.0(typedoc@0.28.18)
     transitivePeerDependencies:
       - encoding
       - openapi-types
@@ -6560,8 +6581,6 @@ snapshots:
   postgres-interval@1.2.0:
     dependencies:
       xtend: 4.0.2
-
-  prettier@3.8.1: {}
 
   process-warning@5.0.0: {}
 
@@ -7039,9 +7058,7 @@ snapshots:
 
   tr46@0.0.3: {}
 
-  tsconfck@2.1.2(typescript@5.9.3):
-    optionalDependencies:
-      typescript: 5.9.3
+  tsconfck@2.1.2: {}
 
   tslib@1.14.1: {}
 
@@ -7095,24 +7112,21 @@ snapshots:
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
 
-  typedoc-plugin-coverage@4.0.2(typedoc@0.28.18(typescript@5.9.3)):
+  typedoc-plugin-coverage@4.0.2(typedoc@0.28.18):
     dependencies:
-      typedoc: 0.28.18(typescript@5.9.3)
+      typedoc: 0.28.18
 
-  typedoc-plugin-markdown@4.11.0(typedoc@0.28.18(typescript@5.9.3)):
+  typedoc-plugin-markdown@4.11.0(typedoc@0.28.18):
     dependencies:
-      typedoc: 0.28.18(typescript@5.9.3)
+      typedoc: 0.28.18
 
-  typedoc@0.28.18(typescript@5.9.3):
+  typedoc@0.28.18:
     dependencies:
       '@gerrit0/mini-shiki': 3.23.0
       lunr: 2.3.9
       markdown-it: 14.1.1
       minimatch: 10.2.5
-      typescript: 5.9.3
       yaml: 2.8.3
-
-  typescript@5.9.3: {}
 
   uc.micro@2.1.0: {}
 

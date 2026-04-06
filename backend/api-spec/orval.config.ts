@@ -5,7 +5,7 @@ const backendZodSrc = path.resolve(__dirname, "../src/generated");
 const frontendApiSrc = path.resolve(__dirname, "../../frontend/src/api");
 
 const titleTransformer: InputTransformerFn = (config) => {
-  config.info ??= {};
+  config.info ??= { title: "Api", version: "1.0.0" };
   config.info.title = "Api";
 
   return config;

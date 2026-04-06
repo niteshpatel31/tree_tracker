@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, citizensTable, forestOfficersTable } from "../db";
 import crypto from "crypto";
 
@@ -16,7 +16,7 @@ router.get("/admin/users", async (_req, res): Promise<void> => {
       id: citizensTable.id,
       name: citizensTable.name,
       email: citizensTable.email,
-      role: "citizen" as const,
+      role: sql<string>`'citizen'`,
       state: citizensTable.state,
       createdAt: citizensTable.createdAt,
     }).from(citizensTable);
@@ -25,7 +25,7 @@ router.get("/admin/users", async (_req, res): Promise<void> => {
       id: forestOfficersTable.id,
       name: forestOfficersTable.name,
       email: forestOfficersTable.email,
-      role: "officer" as const,
+      role: sql<string>`'officer'`,
       state: forestOfficersTable.state,
       employeeId: forestOfficersTable.employeeId,
       department: forestOfficersTable.department,
@@ -52,11 +52,13 @@ router.post("/admin/users", async (req, res): Promise<void> => {
     const { name, email, password, role, state, employeeId, department, designation } = req.body as Record<string, string>;
 
     if (!name?.trim() || !email?.trim() || !password || !role || !state) {
-      return res.status(400).json({ error: "Name, email, password, role, and state are required." });
+      res.status(400).json({ error: "Name, email, password, role, and state are required." });
+      return;
     }
 
     if (role === "officer" && (!employeeId?.trim() || !department || !designation)) {
-      return res.status(400).json({ error: "Employee ID, department, and designation are required for officers." });
+      res.status(400).json({ error: "Employee ID, department, and designation are required for officers." });
+      return;
     }
 
     // Check if email already exists
@@ -64,13 +66,15 @@ router.post("/admin/users", async (req, res): Promise<void> => {
     const existingOfficer = await db.select().from(forestOfficersTable).where(eq(forestOfficersTable.email, email.toLowerCase().trim())).limit(1);
 
     if (existingCitizen.length > 0 || existingOfficer.length > 0) {
-      return res.status(409).json({ error: "An account with this email already exists." });
+      res.status(409).json({ error: "An account with this email already exists." });
+      return;
     }
 
     if (role === "officer" && employeeId) {
       const existingEmpId = await db.select().from(forestOfficersTable).where(eq(forestOfficersTable.employeeId, employeeId.trim().toUpperCase())).limit(1);
       if (existingEmpId.length > 0) {
-        return res.status(409).json({ error: "This Employee ID is already registered." });
+        res.status(409).json({ error: "This Employee ID is already registered." });
+        return;
       }
     }
 
@@ -134,7 +138,8 @@ router.put("/admin/users/:id", async (req, res): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
-      return res.status(400).json({ error: "Invalid user ID" });
+      res.status(400).json({ error: "Invalid user ID" });
+      return;
     }
 
     const { name, email, state, employeeId, department, designation, verificationStatus } = req.body as Record<string, string>;
@@ -145,7 +150,8 @@ router.put("/admin/users/:id", async (req, res): Promise<void> => {
 
     const user = citizen || officer;
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     const isCitizen = !!citizen;
@@ -155,7 +161,8 @@ router.put("/admin/users/:id", async (req, res): Promise<void> => {
       const existingCitizen = await db.select().from(citizensTable).where(eq(citizensTable.email, email.toLowerCase().trim())).limit(1);
       const existingOfficer = await db.select().from(forestOfficersTable).where(eq(forestOfficersTable.email, email.toLowerCase().trim())).limit(1);
       if ((existingCitizen.length > 0 && existingCitizen[0].id !== id) || (existingOfficer.length > 0 && existingOfficer[0].id !== id)) {
-        return res.status(409).json({ error: "An account with this email already exists." });
+        res.status(409).json({ error: "An account with this email already exists." });
+        return;
       }
     }
 
@@ -217,7 +224,8 @@ router.delete("/admin/users/:id", async (req, res): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
-      return res.status(400).json({ error: "Invalid user ID" });
+      res.status(400).json({ error: "Invalid user ID" });
+      return;
     }
 
     // Check if user exists and delete
@@ -225,7 +233,8 @@ router.delete("/admin/users/:id", async (req, res): Promise<void> => {
     const officerResult = await db.delete(forestOfficersTable).where(eq(forestOfficersTable.id, id)).returning();
 
     if (citizenResult.length === 0 && officerResult.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     res.json({ success: true });

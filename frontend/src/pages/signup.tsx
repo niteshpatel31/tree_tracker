@@ -47,7 +47,7 @@ export default function SignUp() {
   const [oForm, setOForm] = useState({ name: "", email: "", state: "", employeeId: "", department: "", designation: "", password: "", confirm: "" });
 
   // OTP verification state
-  const [otpState, setOtpState] = useState<{ officerId: number; otp: string } | null>(null);
+  const [otpState, setOtpState] = useState<{ officerId: number } | null>(null);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -89,7 +89,7 @@ export default function SignUp() {
     });
     setLoading(false);
     if (!result.success) return setError(result.error ?? "Sign up failed.");
-    setOtpState({ officerId: result.officerId!, otp: result.otp! });
+    setOtpState({ officerId: result.officerId! });
   }
 
   // ── OTP Verification screen ──
@@ -230,7 +230,7 @@ export default function SignUp() {
 }
 
 function OtpVerifyScreen({ otpState, error, loading, setError, navigate }: {
-  otpState: { officerId: number; otp: string };
+  otpState: { officerId: number };
   error: string; loading: boolean;
   setError: (e: string) => void;
   navigate: (p: string) => void;
@@ -261,9 +261,8 @@ function OtpVerifyScreen({ otpState, error, loading, setError, navigate }: {
         <div className="bg-white border border-border rounded-xl shadow-sm p-7">
           {/* OTP display */}
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6 text-center">
-            <div className="text-xs text-emerald-700 font-medium uppercase tracking-wide mb-2">Your Verification OTP</div>
-            <div className="text-3xl font-mono font-bold tracking-[0.3em] text-emerald-800">{otpState.otp}</div>
-            <div className="text-xs text-emerald-600 mt-2">In production, this would be sent to your government email</div>
+            <div className="text-sm text-emerald-800 font-medium mb-1">Check your email</div>
+            <div className="text-xs text-emerald-600">We've sent a 6-digit verification code to your government email address.</div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

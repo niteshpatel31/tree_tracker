@@ -9,7 +9,7 @@ export default function Home() {
   const markersRef = useRef<CircleMarker[]>([]);
   const [mapReady, setMapReady] = useState(false);
 
-  const { data: treesData } = useListTrees({ query: { limit: 500 } });
+  const { data: treesData } = useListTrees();
   const { data: stats } = useGetDashboardStats();
 
   // Initialize map once on mount

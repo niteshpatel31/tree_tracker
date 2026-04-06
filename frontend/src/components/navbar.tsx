@@ -117,7 +117,7 @@ export default function Navbar() {
                       >
                         Dashboard
                       </Link>
-                      {(user.role === "admin" || user.role === "officer") && (
+                      {user.role === "officer" && (
                         <Link
                           href="/admin"
                           onClick={() => setMenuOpen(false)}

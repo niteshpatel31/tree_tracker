@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpOfficer = useCallback(async (data: OfficerSignUpData) => {
     const { ok, data: json } = await apiFetch("/api/auth/officer/signup", { method: "POST", body: JSON.stringify(data) });
     if (!ok) return { success: false, error: json.error ?? "Sign up failed." };
-    return { success: true, officerId: json.officerId, otp: json.otp };
+    return { success: true, officerId: json.officerId };
   }, []);
 
   const verifyOfficer = useCallback(async (officerId: number, otp: string) => {

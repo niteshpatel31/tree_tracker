@@ -56,7 +56,9 @@ export default function AdminPanel() {
     species: "",
     plantedBy: "",
     photoUrl: "",
-    notes: ""
+    notes: "",
+    status: undefined as any,
+    survivalStatus: undefined as any
   });
 
   // API hooks
@@ -73,7 +75,7 @@ export default function AdminPanel() {
   const deleteTreeMutation = useDeleteTree();
 
   // Check if user is admin or officer
-  if (user?.role !== "admin" && user?.role !== "officer") {
+  if (user?.role !== "officer") {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="text-center">
@@ -227,7 +229,9 @@ export default function AdminPanel() {
         species: "",
         plantedBy: "",
         photoUrl: "",
-        notes: ""
+        notes: "",
+        status: undefined as any,
+        survivalStatus: undefined as any
       });
       refetchTrees();
     } catch (error: any) {
@@ -346,7 +350,9 @@ export default function AdminPanel() {
         species: "",
         plantedBy: "",
         photoUrl: "",
-        notes: ""
+        notes: "",
+        status: undefined as any,
+        survivalStatus: undefined as any
       });
     }
     setIsTreeDialogOpen(true);
