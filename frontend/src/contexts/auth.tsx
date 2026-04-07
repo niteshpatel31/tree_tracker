@@ -96,8 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpOfficer = useCallback(async (data: OfficerSignUpData) => {
     const { ok, data: json } = await apiFetch("/api/auth/officer/signup", { method: "POST", body: JSON.stringify(data) });
     if (!ok) return { success: false, error: json.error ?? "Sign up failed." };
-    console.log("DEVELOPMENT OTP (since email is mocked):", json.devOtp);
-    return { success: true, officerId: json.officerId };
+    storeSession(json.token, "officer");
+    setUser(json.user);
+    return { success: true };
   }, []);
 
   const verifyOfficer = useCallback(async (officerId: number, otp: string) => {
@@ -117,9 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginOfficer = useCallback(async (email: string, password: string) => {
-    const { ok, data: json, status } = await apiFetch("/api/auth/officer/login", { method: "POST", body: JSON.stringify({ email, password }) });
+    const { ok, data: json } = await apiFetch("/api/auth/officer/login", { method: "POST", body: JSON.stringify({ email, password }) });
     if (!ok) {
-      if (status === 403) return { success: false, error: json.error, officerId: json.officerId };
       return { success: false, error: json.error ?? "Login failed." };
     }
     storeSession(json.token, "officer");

@@ -89,12 +89,7 @@ export default function SignUp() {
     });
     setLoading(false);
     if (!result.success) return setError(result.error ?? "Sign up failed.");
-    setOtpState({ officerId: result.officerId! });
-  }
-
-  // ── OTP Verification screen ──
-  if (otpState) {
-    return <OtpVerifyScreen otpState={otpState} error={error} loading={loading} setError={setError} navigate={navigate} />;
+    navigate("/");
   }
 
   return (
@@ -170,7 +165,7 @@ export default function SignUp() {
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 mb-4 flex gap-2">
                 <span>🔐</span>
-                <span>Your Employee ID will be verified. An OTP will be issued for secure account activation.</span>
+                <span>Your Employee ID will be registered with the Government Portal.</span>
               </div>
               <form onSubmit={handleOfficerSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
@@ -214,7 +209,7 @@ export default function SignUp() {
                 </div>
                 {error && <div className="bg-destructive/10 text-destructive text-sm px-3 py-2 rounded-lg border border-destructive/20">{error}</div>}
                 <button type="submit" disabled={loading} className="w-full bg-emerald-700 text-white py-2.5 rounded-lg font-medium text-sm hover:bg-emerald-800 disabled:opacity-60">
-                  {loading ? "Submitting..." : "Submit & Get OTP"}
+                  {loading ? "Submitting..." : "Create Account"}
                 </button>
               </form>
             </>

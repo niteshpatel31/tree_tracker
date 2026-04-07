@@ -13,9 +13,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [unverifiedId, setUnverifiedId] = useState<number | null>(null);
 
-  function reset() { setEmail(""); setPassword(""); setError(""); setUnverifiedId(null); }
+  function reset() { setEmail(""); setPassword(""); setError(""); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,9 +31,6 @@ export default function Login() {
       navigate("/");
     } else {
       setError(result.error ?? "Login failed.");
-      if ("officerId" in result && result.officerId) {
-        setUnverifiedId(result.officerId as number);
-      }
     }
   }
 
@@ -98,11 +94,6 @@ export default function Login() {
             {error && (
               <div className="bg-destructive/10 text-destructive text-sm px-3 py-2 rounded-lg border border-destructive/20">
                 {error}
-                {unverifiedId && (
-                  <Link href="/signup" className="block mt-1 font-medium text-primary hover:underline">
-                    Complete OTP verification →
-                  </Link>
-                )}
               </div>
             )}
 

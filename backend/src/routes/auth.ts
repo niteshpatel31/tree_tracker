@@ -122,7 +122,7 @@ router.post("/auth/officer/signup", async (req, res): Promise<void> => {
     return;
   }
 
-  const otp = generateOtp();
+  const token = generateToken();
   const [officer] = await db.insert(forestOfficersTable).values({
     name: name.trim(),
     email: email.toLowerCase().trim(),
@@ -131,24 +131,14 @@ router.post("/auth/officer/signup", async (req, res): Promise<void> => {
     employeeId: employeeId.trim().toUpperCase(),
     department,
     designation,
-    verificationStatus: "pending",
-    verificationOtp: otp,
+    verificationStatus: "verified",
+    sessionToken: token,
   }).returning();
 
-  // Send OTP via Ethereal Mail
-  if (mailTransporter) {
-    const info = await mailTransporter.sendMail({
-      from: '"TreeTrack Verification" <no-reply@treetrack.gov.in>',
-      to: officer.email,
-      subject: "Your Officer Verification OTP",
-      text: `Hello ${officer.name},\n\nYour Employee ID (${officer.employeeId}) requires verification.\nYour OTP for Forest Officer verification is: ${otp}\n\nPlease enter this to activate your account.`
-    });
-    console.log("OTP Email Sent! Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  } else {
-    console.log(`Fallback (Mailer absent) - OTP for ${officer.email} is: ${otp}`);
-  }
-
-  res.status(201).json({ officerId: officer.id, devOtp: otp, message: "Ethereal Mail used. Check terminal, or use devOtp." });
+  res.status(201).json({ 
+    user: { id: officer.id, name: officer.name, email: officer.email, role: "officer", state: officer.state, department: officer.department, designation: officer.designation, employeeId: officer.employeeId, createdAt: officer.createdAt },
+    token 
+  });
 });
 
 // POST /api/auth/officer/verify
@@ -201,10 +191,6 @@ router.post("/auth/officer/login", async (req, res): Promise<void> => {
 
   if (!officer || officer.passwordHash !== hashPassword(password)) {
     res.status(401).json({ error: "Invalid email or password." });
-    return;
-  }
-  if (officer.verificationStatus !== "verified") {
-    res.status(403).json({ error: "Account not verified. Please complete OTP verification first.", officerId: officer.id });
     return;
   }
 
