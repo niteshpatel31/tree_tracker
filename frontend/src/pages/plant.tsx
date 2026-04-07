@@ -61,6 +61,12 @@ export default function PlantTree() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState("");
+  const [speciesSearch, setSpeciesSearch] = useState("");
+  const [showSpeciesDropdown, setShowSpeciesDropdown] = useState(false);
+
+  const filteredSpecies = SPECIES.filter((s) =>
+    s.toLowerCase().includes(speciesSearch.toLowerCase())
+  );
 
   function handleStateChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const selected = INDIAN_STATES.find((s) => s.code === e.target.value);
@@ -208,18 +214,44 @@ export default function PlantTree() {
           </div>
         </div>
 
-        <div>
+        <div className="relative">
           <label className="block text-sm font-medium text-foreground mb-1">Species *</label>
-          <select
-            value={form.species}
-            onChange={(e) => setForm((f) => ({ ...f, species: e.target.value }))}
+          <input
+            type="text"
+            value={showSpeciesDropdown ? speciesSearch : form.species}
+            onChange={(e) => {
+              setSpeciesSearch(e.target.value);
+              if (!showSpeciesDropdown) setShowSpeciesDropdown(true);
+            }}
+            onFocus={() => {
+              setShowSpeciesDropdown(true);
+              setSpeciesSearch("");
+            }}
+            onBlur={() => setShowSpeciesDropdown(false)}
+            placeholder="Search and select species"
             className="w-full border border-input rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="">Select Species</option>
-            {SPECIES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+          />
+          {showSpeciesDropdown && (
+            <ul className="absolute z-10 w-full bg-white border border-input rounded-md mt-1 max-h-60 overflow-auto shadow-lg">
+              {filteredSpecies.length > 0 ? (
+                filteredSpecies.map((s) => (
+                  <li
+                    key={s}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setForm((f) => ({ ...f, species: s }));
+                      setShowSpeciesDropdown(false);
+                    }}
+                    className="px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                  >
+                    {s}
+                  </li>
+                ))
+              ) : (
+                <li className="px-3 py-2 text-sm text-muted-foreground p-2">No species found</li>
+              )}
+            </ul>
+          )}
           {errors.species && <p className="text-destructive text-xs mt-1">{errors.species}</p>}
         </div>
 
