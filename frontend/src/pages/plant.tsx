@@ -35,17 +35,15 @@ const INDIAN_STATES = [
   { code: "DL", name: "Delhi" },
 ];
 
-const SPECIES = [
-  "Teak (Sagwan)", "Neem", "Peepal", "Banyan", "Mango",
-  "Bamboo", "Eucalyptus", "Pine", "Sal", "Sheesham (Rosewood)",
-  "Arjuna", "Jamun", "Gulmohar", "Jackfruit", "Tamarind",
-  "Coconut", "Mahua", "Khejri", "Sandalwood", "Amla (Gooseberry)",
-];
+import { SPECIES } from "@/lib/species";
+
+import { useAuth } from "@/contexts/auth";
 
 export default function PlantTree() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const createTree = useCreateTree();
+  const { user } = useAuth();
 
   const [generatedCode, setGeneratedCode] = useState<string>("");
   const [form, setForm] = useState({
@@ -56,7 +54,7 @@ export default function PlantTree() {
     latitude: "",
     longitude: "",
     species: "",
-    plantedBy: "",
+    plantedBy: user?.name || "",
     photoUrl: "",
     notes: "",
   });
@@ -125,6 +123,7 @@ export default function PlantTree() {
           longitude: Number(form.longitude),
           species: form.species,
           plantedBy: form.plantedBy.trim(),
+          planterEmail: user?.email || undefined,
           photoUrl: form.photoUrl.trim() || undefined,
           notes: form.notes.trim() || undefined,
         },

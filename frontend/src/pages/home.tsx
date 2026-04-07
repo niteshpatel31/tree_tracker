@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import Logo from "@/components/logo";
+import { useGetDashboardStats } from "@/api";
 
 const featureCards = [
   {
@@ -26,6 +27,8 @@ const featureCards = [
 ];
 
 export default function Home() {
+  const { data: stats } = useGetDashboardStats();
+
   return (
     <div className="min-h-screen bg-green-50 text-slate-900">
       <section className="relative overflow-hidden bg-white">
@@ -63,20 +66,20 @@ export default function Home() {
 
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-3xl border border-green-200 bg-green-50 p-6 shadow-sm">
-                  <div className="text-3xl font-semibold text-green-900">56K+</div>
+                  <div className="text-3xl font-semibold text-green-900">{stats?.totalTrees.toLocaleString() || "0"}</div>
                   <p className="mt-2 text-sm uppercase tracking-[0.24em] text-green-600">Trees registered</p>
                 </div>
                 <div className="rounded-3xl border border-green-200 bg-green-50 p-6 shadow-sm">
-                  <div className="text-3xl font-semibold text-emerald-700">28</div>
+                  <div className="text-3xl font-semibold text-emerald-700">{stats?.totalStates || "0"}</div>
                   <p className="mt-2 text-sm uppercase tracking-[0.24em] text-green-600">States covered</p>
                 </div>
                 <div className="rounded-3xl border border-green-200 bg-green-50 p-6 shadow-sm">
-                  <div className="text-3xl font-semibold text-green-900">4.8/5</div>
-                  <p className="mt-2 text-sm uppercase tracking-[0.24em] text-green-600">Officer satisfaction</p>
+                  <div className="text-3xl font-semibold text-green-900">{stats?.survivalRate || "0"}%</div>
+                  <p className="mt-2 text-sm uppercase tracking-[0.24em] text-green-600">Survival Rate</p>
                 </div>
                 <div className="rounded-3xl border border-green-200 bg-green-50 p-6 shadow-sm">
-                  <div className="text-3xl font-semibold text-teal-700">24/7</div>
-                  <p className="mt-2 text-sm uppercase tracking-[0.24em] text-green-600">Active monitoring</p>
+                  <div className="text-3xl font-semibold text-teal-700">{stats?.carbonCreditsTotal.toFixed(0) || "0"}</div>
+                  <p className="mt-2 text-sm uppercase tracking-[0.24em] text-green-600">Carbon Credits</p>
                 </div>
               </div>
             </div>
@@ -91,31 +94,31 @@ export default function Home() {
                 </div>
                 <div className="rounded-[1.75rem] bg-slate-900/95 p-6 shadow-inner shadow-slate-900/40 ring-1 ring-white/10">
                   <div className="flex items-center justify-between text-sm text-slate-400">
-                    <span>Protection index</span>
-                    <span className="font-semibold text-white">78%</span>
+                    <span>Survival rate index</span>
+                    <span className="font-semibold text-white">{stats?.survivalRate || 0}%</span>
                   </div>
                   <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
-                    <div className="h-2 w-5/6 rounded-full bg-emerald-500" />
+                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${stats?.survivalRate || 0}%` }} />
                   </div>
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     <div className="rounded-3xl bg-slate-900/90 p-4">
-                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Watchlist</p>
-                      <p className="mt-3 text-xl font-semibold text-white">4,212</p>
+                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">At Risk</p>
+                      <p className="mt-3 text-xl font-semibold text-white">{stats?.totalAtRisk.toLocaleString() || "0"}</p>
                     </div>
                     <div className="rounded-3xl bg-slate-900/90 p-4">
-                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Verified reports</p>
-                      <p className="mt-3 text-xl font-semibold text-white">14,800</p>
+                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Total reports</p>
+                      <p className="mt-3 text-xl font-semibold text-white">{stats?.totalReports.toLocaleString() || "0"}</p>
                     </div>
                   </div>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="rounded-3xl bg-slate-900/90 p-5">
-                    <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Last update</p>
-                    <p className="mt-3 text-xl font-semibold">5 mins ago</p>
+                    <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Total Planted</p>
+                    <p className="mt-3 text-xl font-semibold">{stats?.totalPlanted.toLocaleString() || "0"}</p>
                   </div>
                   <div className="rounded-3xl bg-slate-900/90 p-5">
-                    <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Active zones</p>
-                    <p className="mt-3 text-xl font-semibold">12</p>
+                    <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Total Cut</p>
+                    <p className="mt-3 text-xl font-semibold">{stats?.totalCut.toLocaleString() || "0"}</p>
                   </div>
                 </div>
               </div>

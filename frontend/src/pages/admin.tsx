@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Trees, BarChart3, Plus, Edit, Trash2, Search, Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Users, Trees, BarChart3, Plus, Edit, Trash2, Search, Loader2, FileText, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import {
   useListUsers,
   useCreateUser,
@@ -21,7 +22,10 @@ import {
   useCreateTree,
   useUpdateTreeStatus,
   useDeleteTree,
-  useGetDashboardStats
+  useGetDashboardStats,
+  useListReports,
+  useUpdateReportAction,
+  getListReportsQueryKey
 } from "@/api";
 
 export default function AdminPanel() {
@@ -73,6 +77,32 @@ export default function AdminPanel() {
   const createTreeMutation = useCreateTree();
   const updateTreeMutation = useUpdateTreeStatus();
   const deleteTreeMutation = useDeleteTree();
+
+  // Reports
+  const queryClient = useQueryClient();
+  const { data: reportsData, isLoading: reportsLoading, refetch: refetchReports } = useListReports();
+  const updateReportActionMutation = useUpdateReportAction();
+  const [reportFilter, setReportFilter] = useState<"all" | "pending" | "verified" | "rejected">("pending");
+
+  const handleReportAction = async (reportId: number, status: "verified" | "rejected") => {
+    try {
+      await updateReportActionMutation.mutateAsync({ id: reportId, data: { status } });
+      toast({
+        title: status === "verified" ? "Report Verified" : "Report Rejected",
+        description: status === "verified"
+          ? "Report verified. Tree status has been updated automatically."
+          : "Report has been rejected.",
+      });
+      refetchReports();
+      queryClient.invalidateQueries({ queryKey: getListReportsQueryKey() });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to process report.",
+        variant: "destructive"
+      });
+    }
+  };
 
   // Check if user is admin or officer
   if (user?.role !== "officer") {
@@ -378,7 +408,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Dashboard
@@ -390,6 +420,10 @@ export default function AdminPanel() {
           <TabsTrigger value="trees" className="flex items-center gap-2">
             <Trees className="h-4 w-4" />
             Tree Management
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Reports
           </TabsTrigger>
         </TabsList>
 
@@ -939,6 +973,144 @@ export default function AdminPanel() {
                   )}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Reports Management Tab */}
+        <TabsContent value="reports" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Reports Management
+              </CardTitle>
+              <CardDescription>Review and take action on citizen-submitted tree reports</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Filter bar */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {(["all", "pending", "verified", "rejected"] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setReportFilter(f)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold capitalize border transition-colors ${
+                      reportFilter === f
+                        ? "bg-primary text-white border-primary"
+                        : "border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+
+              {reportsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Tree Code</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Reported By</TableHead>
+                      <TableHead>Location</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(reportsData?.reports ?? []).filter(r => reportFilter === "all" || r.status === reportFilter).length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                          No reports found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      (reportsData?.reports ?? []).filter(r => reportFilter === "all" || r.status === reportFilter).map((report) => (
+                        <TableRow key={report.id}>
+                          <TableCell className="font-mono text-xs">#{report.id}</TableCell>
+                          <TableCell>
+                            <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
+                              {report.treeCode ?? "—"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs capitalize ${
+                                report.reportType === "illegal_cutting" || report.reportType === "cutting"
+                                  ? "border-red-300 text-red-700 bg-red-50"
+                                  : report.reportType === "survival_check"
+                                  ? "border-yellow-300 text-yellow-700 bg-yellow-50"
+                                  : "border-green-300 text-green-700 bg-green-50"
+                              }`}
+                            >
+                              {report.reportType.replace("_", " ")}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">{report.reportedBy}</TableCell>
+                          <TableCell className="text-xs text-muted-foreground">
+                            {report.district}, {report.state}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs capitalize ${
+                                report.status === "pending"
+                                  ? "border-yellow-300 text-yellow-700 bg-yellow-50"
+                                  : report.status === "verified"
+                                  ? "border-green-300 text-green-700 bg-green-50"
+                                  : "border-red-300 text-red-700 bg-red-50"
+                              }`}
+                            >
+                              {report.status === "pending" && <AlertTriangle className="h-3 w-3 mr-1 inline" />}
+                              {report.status === "verified" && <CheckCircle className="h-3 w-3 mr-1 inline" />}
+                              {report.status === "rejected" && <XCircle className="h-3 w-3 mr-1 inline" />}
+                              {report.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground">
+                            {new Date(report.createdAt).toLocaleDateString("en-IN")}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {report.status === "pending" ? (
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-green-700 border-green-300 hover:bg-green-50 text-xs h-7"
+                                  onClick={() => handleReportAction(report.id, "verified")}
+                                  disabled={updateReportActionMutation.isPending}
+                                >
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Verify
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-red-700 border-red-300 hover:bg-red-50 text-xs h-7"
+                                  onClick={() => handleReportAction(report.id, "rejected")}
+                                  disabled={updateReportActionMutation.isPending}
+                                >
+                                  <XCircle className="h-3 w-3 mr-1" />
+                                  Reject
+                                </Button>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground italic">Actioned</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

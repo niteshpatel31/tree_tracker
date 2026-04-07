@@ -48,7 +48,7 @@ export default defineConfig({
     output: {
       workspace: backendZodSrc,
       client: "zod",
-      target: "api",
+      target: "api.ts",
       mode: "single",
       clean: true,
       prettier: true,

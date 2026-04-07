@@ -2,11 +2,11 @@ import { Router, type IRouter } from "express";
 import { eq, and, sql } from "drizzle-orm";
 import { db, treesTable } from "../db";
 import {
-  CreateTreeBody,
-  UpdateTreeStatusBody,
-  UpdateTreeStatusParams,
-  GetTreeParams,
-  ListTreesQueryParams,
+  createTreeBody,
+  updateTreeStatusBody,
+  updateTreeStatusParams,
+  getTreeParams,
+  listTreesQueryParams,
 } from "../generated/api";
 
 const router: IRouter = Router();
@@ -23,21 +23,22 @@ function calculateCarbonCredits(species: string): number {
   return isHigh ? 2.5 : 1.2;
 }
 
-async function getNextSerial(stateCode: string, year: number): Promise<number> {
+async function getNextSerial(stateCode: string, districtCode: string, year: number): Promise<number> {
   const result = await db
-    .select({ count: sql<number>`count(*)` })
+    .select({ count: sql<number>`count(*)::int` })
     .from(treesTable)
     .where(
       and(
         eq(treesTable.stateCode, stateCode.toUpperCase()),
+        eq(treesTable.districtCode, districtCode.toUpperCase()),
         sql`EXTRACT(YEAR FROM ${treesTable.plantationDate}) = ${year}`
       )
     );
-  return (result[0]?.count ?? 0) + 1;
+  return Number(result[0]?.count ?? 0) + 1;
 }
 
 router.get("/trees", async (req, res): Promise<void> => {
-  const parsed = ListTreesQueryParams.safeParse(req.query);
+  const parsed = listTreesQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
@@ -63,7 +64,7 @@ router.get("/trees", async (req, res): Promise<void> => {
 });
 
 router.post("/trees", async (req, res): Promise<void> => {
-  const parsed = CreateTreeBody.safeParse(req.body);
+  const parsed = createTreeBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
@@ -72,7 +73,7 @@ router.post("/trees", async (req, res): Promise<void> => {
   const data = parsed.data;
   const now = new Date();
   const year = now.getFullYear();
-  const serial = await getNextSerial(data.stateCode, year);
+  const serial = await getNextSerial(data.stateCode, data.districtCode, year);
   const treeCode = generateTreeCode(data.stateCode, data.districtCode, year, serial);
   const carbonCredits = calculateCarbonCredits(data.species);
 
@@ -88,6 +89,7 @@ router.post("/trees", async (req, res): Promise<void> => {
       longitude: data.longitude,
       species: data.species,
       plantedBy: data.plantedBy,
+      planterEmail: data.planterEmail ?? null,
       photoUrl: data.photoUrl ?? null,
       notes: data.notes ?? null,
       status: "planted",
@@ -103,7 +105,7 @@ router.post("/trees", async (req, res): Promise<void> => {
 
 router.get("/trees/:id", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const params = GetTreeParams.safeParse({ id: parseInt(raw, 10) });
+  const params = getTreeParams.safeParse({ id: parseInt(raw, 10) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
@@ -124,13 +126,13 @@ router.get("/trees/:id", async (req, res): Promise<void> => {
 
 router.patch("/trees/:id", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const params = UpdateTreeStatusParams.safeParse({ id: parseInt(raw, 10) });
+  const params = updateTreeStatusParams.safeParse({ id: parseInt(raw, 10) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
   }
 
-  const parsed = UpdateTreeStatusBody.safeParse(req.body);
+  const parsed = updateTreeStatusBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
@@ -156,7 +158,7 @@ router.patch("/trees/:id", async (req, res): Promise<void> => {
 
 router.delete("/trees/:id", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const params = GetTreeParams.safeParse({ id: parseInt(raw, 10) });
+  const params = getTreeParams.safeParse({ id: parseInt(raw, 10) });
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;

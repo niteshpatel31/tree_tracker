@@ -183,6 +183,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Report"
+  /reports/{id}/action:
+    patch:
+      operationId: updateReportAction
+      tags: [reports]
+      summary: Take action on a report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReportActionBody"
+      responses:
+        "200":
+          description: Report action executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - unauthorized action
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Report not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /dashboard/stats:
     get:
@@ -332,6 +374,9 @@ components:
           type: string
         plantedBy:
           type: string
+        planterEmail:
+          type: string
+          nullable: true
         photoUrl:
           type: string
           nullable: true
@@ -397,6 +442,9 @@ components:
           type: string
         plantedBy:
           type: string
+        planterEmail:
+          type: string
+          nullable: true
         photoUrl:
           type: string
           nullable: true
@@ -522,6 +570,15 @@ components:
         - description
         - state
         - district
+
+    UpdateReportActionBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [verified, rejected]
+      required:
+        - status
 
     DashboardStats:
       type: object

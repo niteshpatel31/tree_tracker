@@ -3,6 +3,7 @@ import { useGetTree, useUpdateTreeStatus, getListTreesQueryKey, getGetTreeQueryK
 import { useQueryClient } from "@tanstack/react-query";
 import QRCode from "qrcode.react";
 import { useRef, useState } from "react";
+import { useAuth } from "@/contexts/auth";
 
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
@@ -31,6 +32,7 @@ function SurvivalBadge({ status }: { status: string }) {
 }
 
 export default function TreeDetail() {
+  const { user } = useAuth();
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
@@ -219,12 +221,14 @@ Generated: ${new Date().toLocaleString("en-IN")}
 
         {/* Actions */}
         <div className="px-6 py-4 border-t border-border bg-muted/20 flex gap-3 flex-wrap">
-          <button
-            onClick={() => setShowUpdate(!showUpdate)}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            Update Status
-          </button>
+          {user?.role === "officer" && (
+            <button
+              onClick={() => setShowUpdate(!showUpdate)}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Update Status
+            </button>
+          )}
           <button
             onClick={handlePrintQR}
             className="px-4 py-2 border border-border rounded text-sm font-medium hover:bg-muted transition-colors"

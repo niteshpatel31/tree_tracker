@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
-import { db, reportsTable } from "../db";
-import { CreateReportBody } from "../generated/api";
+import { eq } from "drizzle-orm";
+import { db, reportsTable, treesTable } from "../db";
+import { createReportBody } from "../generated/api";
 
 const router: IRouter = Router();
 
@@ -14,7 +15,7 @@ router.get("/reports", async (_req, res): Promise<void> => {
 });
 
 router.post("/reports", async (req, res): Promise<void> => {
-  const parsed = CreateReportBody.safeParse(req.body);
+  const parsed = createReportBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
@@ -40,6 +41,49 @@ router.post("/reports", async (req, res): Promise<void> => {
     .returning();
 
   res.status(201).json(report);
+});
+
+router.patch("/reports/:id/action", async (req, res): Promise<void> => {
+  const userType = req.headers["x-user-type"] as string;
+  if (userType !== "officer" && userType !== "admin") {
+    res.status(403).json({ error: "Only officers or admins can act on reports" });
+    return;
+  }
+
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const reportId = parseInt(raw, 10);
+  if (isNaN(reportId)) {
+    res.status(400).json({ error: "Invalid report ID" });
+    return;
+  }
+
+  const { status } = req.body;
+  if (status !== "verified" && status !== "rejected") {
+    res.status(400).json({ error: "Status must be verified or rejected" });
+    return;
+  }
+
+  const [report] = await db
+    .update(reportsTable)
+    .set({ status })
+    .where(eq(reportsTable.id, reportId))
+    .returning();
+
+  if (!report) {
+    res.status(404).json({ error: "Report not found" });
+    return;
+  }
+
+  // Update underlying tree status based on the report type if verified
+  if (status === "verified" && report.treeId) {
+    if (report.reportType === "cutting" || report.reportType === "illegal_cutting") {
+      await db.update(treesTable).set({ status: "cut" }).where(eq(treesTable.id, report.treeId));
+    } else if (report.reportType === "survival_check") {
+      await db.update(treesTable).set({ survivalStatus: "at_risk" }).where(eq(treesTable.id, report.treeId));
+    }
+  }
+
+  res.json(report);
 });
 
 export default router;

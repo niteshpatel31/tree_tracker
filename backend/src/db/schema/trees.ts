@@ -15,6 +15,7 @@ export const treesTable = pgTable("trees", {
   status: text("status").notNull().default("planted"),
   species: text("species").notNull(),
   plantedBy: text("planted_by").notNull(),
+  planterEmail: text("planter_email"),
   photoUrl: text("photo_url"),
   survivalStatus: text("survival_status").notNull().default("healthy"),
   carbonCredits: doublePrecision("carbon_credits").notNull().default(0),
