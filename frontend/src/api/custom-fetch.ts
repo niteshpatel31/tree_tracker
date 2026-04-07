@@ -323,24 +323,60 @@ async function parseSuccessBody(
 }
 
 export async function customFetch<T = unknown>(
-  input: RequestInfo | URL,
+  config: { url: string; method?: string; data?: any; params?: any; headers?: any; signal?: AbortSignal } | string | Request | URL,
   options: CustomFetchOptions = {},
 ): Promise<T> {
-  input = applyBaseUrl(input);
+  const isStringOrRequest = typeof config === 'string' || isRequest(config as any) || isUrl(config as any);
+  let urlStr = '';
+  let method = options.method || "GET";
+  let generatedHeaders = undefined;
+  let data = undefined;
+  let params = undefined;
+  let signal = options.signal;
+
+  if (isStringOrRequest) {
+    urlStr = resolveUrl(config as any);
+    method = resolveMethod(config as any, options.method);
+    generatedHeaders = isRequest(config as any) ? (config as Request).headers : undefined;
+  } else {
+    const c = config as any;
+    urlStr = c.url as string;
+    method = (c.method || options.method || "GET").toUpperCase();
+    generatedHeaders = c.headers;
+    data = c.data;
+    params = c.params;
+    if (c.signal) signal = c.signal;
+  }
+
+  if (params) {
+    const searchParams = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined) searchParams.append(k, String(v));
+    }
+    const searchString = searchParams.toString();
+    if (searchString) {
+      urlStr += urlStr.includes('?') ? `&${searchString}` : `?${searchString}`;
+    }
+  }
+
+  const inputUrl = applyBaseUrl(urlStr);
   const { responseType = "auto", headers: headersInit, ...init } = options;
 
-  const method = resolveMethod(input, init.method);
+  let body = options.body;
+  if (!body && data !== undefined) {
+    body = JSON.stringify(data);
+  }
 
-  if (init.body != null && (method === "GET" || method === "HEAD")) {
+  if (body != null && (method === "GET" || method === "HEAD")) {
     throw new TypeError(`customFetch: ${method} requests cannot have a body.`);
   }
 
-  const headers = mergeHeaders(isRequest(input) ? input.headers : undefined, headersInit);
+  const headers = mergeHeaders(generatedHeaders, headersInit);
 
   if (
-    typeof init.body === "string" &&
+    typeof body === "string" &&
     !headers.has("content-type") &&
-    looksLikeJson(init.body)
+    looksLikeJson(body)
   ) {
     headers.set("content-type", "application/json");
   }
@@ -358,9 +394,9 @@ export async function customFetch<T = unknown>(
     }
   }
 
-  const requestInfo = { method, url: resolveUrl(input) };
+  const requestInfo = { method, url: resolveUrl(inputUrl) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  const response = await fetch(inputUrl, { ...init, method, headers, body, signal });
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);

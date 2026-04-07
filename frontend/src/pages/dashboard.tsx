@@ -1,4 +1,6 @@
-import { useGetDashboardStats, useGetStateStats, useGetYearStats } from "@/api";
+import { useGetDashboardStats, useGetStateStats, useGetYearStats, useListReports, useUpdateReportAction, getListReportsQueryKey } from "@/api";
+import { useAuth } from "@/contexts/auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
@@ -15,9 +17,22 @@ export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useGetDashboardStats();
   const { data: stateData, isLoading: stateLoading } = useGetStateStats();
   const { data: yearData } = useGetYearStats();
+  const { user } = useAuth();
+  const { data: reportsData } = useListReports();
+  const updateReportAction = useUpdateReportAction();
+  const queryClient = useQueryClient();
 
   const years = yearData?.years ?? [];
   const states = stateData?.states ?? [];
+  const pendingReports = reportsData?.reports?.filter(r => r.status === "pending") ?? [];
+
+  const handleAction = async (reportId: number, status: "verified" | "rejected") => {
+    await updateReportAction.mutateAsync({ id: reportId, data: { status } }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListReportsQueryKey() });
+      }
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -54,6 +69,59 @@ export default function Dashboard() {
               <Bar dataKey="cut" fill="#dc2626" name="Cut" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Officer Pending Reports */}
+      {user?.role === "officer" && (
+        <div className="bg-white border border-border rounded-lg shadow-sm overflow-hidden mb-8">
+          <div className="px-5 py-4 border-b border-border flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Pending Reports</h2>
+            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">{pendingReports.length} Pending</span>
+          </div>
+          {pendingReports.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8 text-sm">No pending reports to review.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tree Code</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Description</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Location</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {pendingReports.map(report => (
+                    <tr key={report.id} className="hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-primary">{report.treeCode}</td>
+                      <td className="px-4 py-3 capitalize">{report.reportType.replace("_", " ")}</td>
+                      <td className="px-4 py-3 text-muted-foreground max-w-xs truncate" title={report.description}>{report.description}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{report.district}, {report.state}</td>
+                      <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                        <button 
+                          onClick={() => handleAction(report.id, "verified")}
+                          disabled={updateReportAction.isPending}
+                          className="px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded text-xs font-medium transition-colors"
+                        >
+                          Verify
+                        </button>
+                        <button 
+                          onClick={() => handleAction(report.id, "rejected")}
+                          disabled={updateReportAction.isPending}
+                          className="px-3 py-1 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded text-xs font-medium transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 

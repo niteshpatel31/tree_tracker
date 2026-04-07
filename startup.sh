@@ -8,7 +8,7 @@ echo "    Starting Tree Tracker Project     "
 echo "======================================"
 
 echo "Releasing necessary ports..."
-kill -9 $(lsof -t -i:5000,5173) 2>/dev/null || true
+kill -9 $(lsof -t -i:5000,7134) 2>/dev/null || true
 
 # Start backend
 echo "[1/2] Setting up and starting Backend..."
@@ -32,7 +32,7 @@ pnpm install
 
 echo "Starting frontend server..."
 # Start the frontend dev server in the foreground
-pnpm run dev
+PORT=7134 pnpm run dev
 
 # If the user stops the frontend server (CTRL+C), trap it and kill the backend too
 trap "echo 'Stopping servers...'; kill $BACKEND_PID" EXIT

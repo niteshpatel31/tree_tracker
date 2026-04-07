@@ -125,6 +125,12 @@ router.get("/trees/:id", async (req, res): Promise<void> => {
 });
 
 router.patch("/trees/:id", async (req, res): Promise<void> => {
+  const userType = req.headers["x-user-type"] as string;
+  if (userType !== "officer" && userType !== "admin") {
+    res.status(403).json({ error: "Only officers or admins can update tree status" });
+    return;
+  }
+
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const params = updateTreeStatusParams.safeParse({ id: parseInt(raw, 10) });
   if (!params.success) {
