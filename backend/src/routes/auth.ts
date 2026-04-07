@@ -148,7 +148,7 @@ router.post("/auth/officer/signup", async (req, res): Promise<void> => {
     console.log(`Fallback (Mailer absent) - OTP for ${officer.email} is: ${otp}`);
   }
 
-  res.status(201).json({ officerId: officer.id });
+  res.status(201).json({ officerId: officer.id, devOtp: otp, message: "Ethereal Mail used. Check terminal, or use devOtp." });
 });
 
 // POST /api/auth/officer/verify
